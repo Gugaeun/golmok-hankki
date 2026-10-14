@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>광진구 골목 한끼 맛집 지도</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='20261001-11') }}">
+  {% if map_client_id %}
+  <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ map_client_id }}"></script>
+  {% endif %}
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">골목 한끼</a>
+    <span>중곡동·군자동·화양동·능동 맛집을 모아봐요</span>
+  </header>
+  <main class="layout">
+    <section class="results">
+      <p class="eyebrow">우리 동네 맛집 아카이브</p>
+      <h1>오늘은 어디서<br>한 끼 먹을까요?</h1>
+      <form class="search" method="get">
+        <label class="sr-only" for="q">맛집 검색</label>
+        <input id="q" name="q" value="{{ query }}" placeholder="가게·음식·주소 검색">
+        <input type="hidden" name="neighborhood" value="{{ neighborhood }}">
+        {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+        {% if exemplary_only %}<input type="hidden" name="exemplary" value="1">{% endif %}
+        <button type="submit">검색</button>
+      </form>
+      <nav class="filters" aria-label="동네 필터">
+        {% for area in ["전체", "중곡동", "군자동", "화양동", "능동"] %}
+        <a class="chip {% if neighborhood == area %}selected{% endif %}" href="{{ url_for('index', neighborhood=area, q=query, category=category or None, exemplary='1' if exemplary_only else None) }}">{{ area }}</a>
+        {% endfor %}
+      </nav>
+      <div class="filter-row">
+        <form class="category-filter" method="get">
+          <input type="hidden" name="neighborhood" value="{{ neighborhood }}">
+          <input type="hidden" name="q" value="{{ query }}">
+          {% if exemplary_only %}<input type="hidden" name="exemplary" value="1">{% endif %}
+          <label for="category">음식 종류</label>
+          <select id="category" name="category" onchange="this.form.submit()">
+            <option value="">전체 종류</option>
+            {% for item in categories %}<option value="{{ item }}" {% if category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}
+          </select>
+        </form>
+        <form class="quality-filter" method="get">
+          <input type="hidden" name="neighborhood" value="{{ neighborhood }}">
+          <input type="hidden" name="q" value="{{ query }}">
+          {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+          <label><input type="checkbox" name="exemplary" value="1" {% if exemplary_only %}checked{% endif %} onchange="this.form.submit()"> 광진구청 모범음식점만 보기</label>
+          {% if exemplary_only %}<a href="{{ url_for('index', neighborhood=neighborhood, q=query, category=category or None) }}">필터 해제</a>{% endif %}
+        </form>
+      </div>
+      <p class="count">가게 {{ total_count }}곳 · {{ page }} / {{ total_pages }}페이지</p>
+      {% if last_crawl %}
+      <p class="crawl-status">마지막 수집: {{ last_crawl.finished_at }} · 목록 {{ last_crawl.listings_seen }}곳 확인 · 대상 {{ last_crawl.target_found }}곳 · 신규 {{ last_crawl.inserted }}곳</p>
+      {% endif %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}<div class="message {{ category }}">{{ message }}</div>{% endfor %}
+      {% endwith %}
+      <div class="cards">
+        {% for place in restaurants %}
+        <article class="card" data-id="{{ place.id }}" data-lat="{{ place.latitude or '' }}" data-lng="{{ place.longitude or '' }}">
+          <div class="card-top"><span class="area-tag">{{ place.neighborhood }}</span>{% if place.source_url and 'gwangjin.go.kr' in place.source_url %}<span class="exemplary-tag"><span aria-hidden="true">★</span> 광진구청 모범음식점</span>{% endif %}<span class="category">{{ place.category or '분류 미정' }}</span></div>
+          <h2>{{ place.name }}</h2>
+          <p>{{ place.address or '주소 정보 없음' }}</p>
+        </article>
+        {% else %}
+        <div class="empty">조건에 맞는 맛집이 없어요.</div>
+        {% endfor %}
+      </div>
+      {% if total_pages > 1 %}
+      <nav class="pagination" aria-label="목록 페이지">
+        {% if page > 1 %}<a href="{{ url_for('index', neighborhood=neighborhood, q=query, category=category or None, exemplary='1' if exemplary_only else None, page=page - 1) }}">← 이전</a>{% endif %}
+        <span>{{ page }} / {{ total_pages }}</span>
+        {% if page < total_pages %}<a href="{{ url_for('index', neighborhood=neighborhood, q=query, category=category or None, exemplary='1' if exemplary_only else None, page=page + 1) }}">다음 →</a>{% endif %}
+      </nav>
+      {% endif %}
+      <details class="add-place">
+        <summary>맛집 직접 추가하기</summary>
+        <form action="{{ url_for('add_restaurant') }}" method="post" class="add-form">
+          <label>동네<select name="neighborhood" required><option value="중곡동">중곡동</option><option value="군자동">군자동</option><option value="화양동">화양동</option><option value="능동">능동</option></select></label>
+          <label>가게 이름<input name="name" required maxlength="120" placeholder="예: 우리 동네 식당"></label>
+          <label>음식 종류<input name="category" maxlength="80" placeholder="예: 한식"></label>
+          <label>주소<input name="address" maxlength="300" placeholder="도로명 또는 지번 주소"></label>
+          <div class="coordinate-fields">
+            <label>경도<input name="longitude" inputmode="decimal" placeholder="선택"></label>
+            <label>위도<input name="latitude" inputmode="decimal" placeholder="선택"></label>
+          </div>
+          <label>출처 URL<input name="source_url" type="url" maxlength="500" placeholder="정보를 확인한 페이지 (선택)"></label>
+          <button type="submit">SQLite에 저장</button>
+        </form>
+      </details>
+      <p class="note">기본 목록은 광진구 일반음식점 인허가 자료이며, 폐업·휴업으로 기록된 과거 인허가 이력은 목록에서 제외합니다. ‘광진구청 모범음식점’ 표시는 구청 목록 크롤링 결과이며, 인허가 자료는 맛집 평가가 아닙니다.</p>
+    </section>
+    <section class="map-panel" aria-label="맛집 지도">
+      {% if map_client_id %}
+      <div id="map"></div>
+      <div id="map-status" class="map-status" role="status">지도 좌표를 불러오는 중…</div>
+      <div class="map-legend"><span aria-hidden="true">★</span> 광진구청 모범음식점</div>
+      {% else %}
+      <div class="map-placeholder"><div class="pin">⌖</div><h2>맛집 지도가 여기에 표시돼요</h2><p>환경 변수 <code>NAVER_MAP_CLIENT_ID</code>를 설정하면 네이버 지도를 불러옵니다.</p></div>
+      {% endif %}
+    </section>
+  </main>
+  {% if map_client_id %}
+  <script>
+    const map = new naver.maps.Map('map', {
+      center: new naver.maps.LatLng(37.563, 127.079), zoom: 14, maxZoom: 20
+    });
+    const currentNeighborhood = {{ neighborhood|tojson }};
+    const currentQuery = {{ query|tojson }};
+    const currentCategory = {{ category|tojson }};
+    const mapStatus = document.getElementById('map-status');
+    let mapPlaces = [];
+    let visibleMarkers = [];
+    let openInfoWindow = null;
+    let redrawQueued = false;
+    let selectedPlaceId = null;
+    let markerByPlaceId = new Map();
+
+    function htmlIcon(label, background, size) {
+      return {
+        content: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${background};color:white;border:2px solid white;box-shadow:0 2px 7px #0004;display:flex;align-items:center;justify-content:center;font:700 12px Arial,sans-serif">${label}</div>`,
+        size: new naver.maps.Size(size, size),
+        anchor: new naver.maps.Point(size / 2, size / 2)
+      };
+    }
+
+    function highlightPlaceCard(placeId) {
+      document.querySelectorAll('.card.is-selected').forEach((card) => card.classList.remove('is-selected'));
+      const card = document.querySelector(`.card[data-id="${placeId}"]`);
+      if (card) card.classList.add('is-selected');
+    }
+
+    function deduplicateMapPlaces(places) {
+      const unique = [];
+      const normalize = (name) => (name || '').toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+      const distanceMeters = (a, b) => {
+        const radians = (value) => value * Math.PI / 180;
+        const dLat = radians(b.latitude - a.latitude);
+        const dLng = radians(b.longitude - a.longitude);
+        const lat1 = radians(a.latitude);
+        const lat2 = radians(b.latitude);
+        const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+        return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+      };
+
+      places.forEach((place) => {
+        const key = normalize(place.name);
+        const duplicate = unique.find((item) => item.neighborhood === place.neighborhood
+          && normalize(item.name) === key
+          && distanceMeters(item, place) <= 25);
+        if (!duplicate) {
+          unique.push({ ...place });
+          return;
+        }
+        duplicate.is_exemplary = duplicate.is_exemplary || place.is_exemplary;
+        if ((place.address || '').length > (duplicate.address || '').length) {
+          duplicate.address = place.address;
+          duplicate.latitude = place.latitude;
+          duplicate.longitude = place.longitude;
+        }
+      });
+      return unique;
+    }
+
+    function showPlace(place, marker) {
+      selectedPlaceId = place.id;
+      highlightPlaceCard(place.id);
+      const content = document.createElement('div');
+      content.style.cssText = 'padding:12px 14px;max-width:270px;font-family:Arial,sans-serif;color:#202b26';
+      const title = document.createElement('strong');
+      title.textContent = place.name;
+      content.appendChild(title);
+      const details = document.createElement('div');
+      details.textContent = `${place.neighborhood} · ${place.category || '분류 미정'}${place.is_exemplary ? ' · 광진구청 모범음식점' : ''}`;
+      details.style.cssText = 'margin-top:5px;font-size:12px;color:#52636b';
+      const address = document.createElement('div');
+      address.textContent = place.address || '주소 정보 없음';
+      address.style.cssText = 'margin-top:5px;font-size:12px;line-height:1.5;color:#66716a';
+      content.append(details, address);
+      const dataNote = document.createElement('div');
+      dataNote.textContent = place.is_exemplary
+        ? '인허가 자료 · 광진구청 모범음식점 목록에서 확인'
+        : '서울시 인허가 자료 기반 · 이용자 리뷰/평점 미수집';
+      dataNote.style.cssText = 'margin-top:7px;font-size:10px;color:#87918a';
+      content.appendChild(dataNote);
+      const naverLink = document.createElement('a');
+      naverLink.href = `https://map.naver.com/p/search/${encodeURIComponent(place.name)}`;
+      naverLink.target = '_blank';
+      naverLink.rel = 'noopener noreferrer';
+      naverLink.textContent = '네이버 지도에서 상세 정보 보기 ↗';
+      naverLink.style.cssText = 'display:inline-block;margin-top:9px;color:#35566a;font-size:12px;font-weight:700';
+      content.appendChild(naverLink);
+      if (openInfoWindow) openInfoWindow.close();
+      openInfoWindow = new naver.maps.InfoWindow({ content, maxWidth: 300 });
+      openInfoWindow.open(map, marker);
+    }
+
+    function redrawMarkers() {
+      visibleMarkers.forEach((marker) => marker.setMap(null));
+      visibleMarkers = [];
+      markerByPlaceId = new Map();
+      const projection = map.getProjection();
+      const zoom = map.getZoom();
+      const cellSize = zoom >= 17 ? 1 : zoom >= 15 ? 42 : 64;
+      const groups = new Map();
+      mapPlaces.forEach((place) => {
+        const position = new naver.maps.LatLng(place.latitude, place.longitude);
+        const pixel = projection.fromCoordToOffset(position);
+        const key = `${Math.floor(pixel.x / cellSize)}:${Math.floor(pixel.y / cellSize)}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push({ place, position });
+      });
+
+      groups.forEach((groupItems) => {
+        let items = groupItems;
+        const selectedItem = items.find(({ place }) => place.id === selectedPlaceId);
+        if (selectedItem) {
+          items = items.filter(({ place }) => place.id !== selectedPlaceId);
+          const selectedMarker = new naver.maps.Marker({
+            position: selectedItem.position,
+            map,
+            title: `선택한 가게: ${selectedItem.place.name}`,
+            zIndex: 1000,
+            icon: htmlIcon('●', '#e04435', 42)
+          });
+          naver.maps.Event.addListener(selectedMarker, 'click', () => showPlace(selectedItem.place, selectedMarker));
+          visibleMarkers.push(selectedMarker);
+          markerByPlaceId.set(selectedItem.place.id, selectedMarker);
+        }
+        if (!items.length) return;
+        if (items.length === 1) {
+          const { place, position } = items[0];
+          const marker = new naver.maps.Marker({
+            position, map, title: place.name,
+            ...(place.is_exemplary ? { icon: htmlIcon('★', '#c58a12', 32) } : {})
+          });
+          naver.maps.Event.addListener(marker, 'click', () => showPlace(place, marker));
+          visibleMarkers.push(marker);
+          markerByPlaceId.set(place.id, marker);
+          return;
+        }
+        const avg = items.reduce((sum, item) => ({
+          lat: sum.lat + item.place.latitude / items.length,
+          lng: sum.lng + item.place.longitude / items.length
+        }), { lat: 0, lng: 0 });
+        const position = new naver.maps.LatLng(avg.lat, avg.lng);
+        const hasExemplary = items.some(({ place }) => place.is_exemplary);
+        const marker = new naver.maps.Marker({
+          position, map, title: `${items.length}곳${hasExemplary ? ' · 모범음식점 포함' : ''}`,
+          icon: htmlIcon(`${items.length}${hasExemplary ? '★' : ''}`, hasExemplary ? '#c58a12' : '#286eae', hasExemplary ? 40 : 34)
+        });
+        naver.maps.Event.addListener(marker, 'click', () => {
+          if (zoom < 17) {
+            map.setCenter(position);
+            map.setZoom(Math.min(20, zoom + 2));
+          } else {
+            const content = document.createElement('div');
+            content.style.cssText = 'padding:12px 14px;max-width:280px;font:13px Arial,sans-serif;line-height:1.7';
+            items.slice(0, 10).forEach(({ place, position: placePosition }) => {
+              const line = document.createElement('div');
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.textContent = `${place.name}${place.is_exemplary ? ' ★' : ''}`;
+              button.style.cssText = 'padding:3px 0;border:0;background:none;color:#35566a;text-align:left;font:inherit;cursor:pointer';
+              button.addEventListener('click', () => {
+                selectedPlaceId = place.id;
+                map.setCenter(placePosition);
+                map.setZoom(18);
+                naver.maps.Event.once(map, 'idle', () => {
+                  redrawQueued = false;
+                  redrawMarkers();
+                  const selectedMarker = markerByPlaceId.get(place.id);
+                  if (selectedMarker) showPlace(place, selectedMarker);
+                });
+              });
+              line.appendChild(button);
+              const naverLink = document.createElement('a');
+              naverLink.href = `https://map.naver.com/p/search/${encodeURIComponent(place.name)}`;
+              naverLink.target = '_blank';
+              naverLink.rel = 'noopener noreferrer';
+              naverLink.textContent = '네이버 지도에서 상세 정보 보기 ↗';
+              naverLink.style.cssText = 'display:block;margin:0 0 5px 8px;color:#52636b;font-size:11px;text-decoration:none';
+              line.appendChild(naverLink);
+              content.appendChild(line);
+            });
+            if (items.length > 10) content.append(`${items.length - 10}곳 더 있음`);
+            if (openInfoWindow) openInfoWindow.close();
+            openInfoWindow = new naver.maps.InfoWindow({ content, maxWidth: 300 });
+            openInfoWindow.open(map, marker);
+          }
+        });
+        visibleMarkers.push(marker);
+      });
+    }
+
+    function scheduleMarkerRedraw() {
+      if (redrawQueued) return;
+      redrawQueued = true;
+      requestAnimationFrame(() => {
+        if (!redrawQueued) return;
+        redrawQueued = false;
+        redrawMarkers();
+      });
+    }
+
+    naver.maps.Event.once(map, 'init', async () => {
+      try {
+        const params = new URLSearchParams({ neighborhood: currentNeighborhood, q: currentQuery, category: currentCategory });
+        const response = await fetch(`/api/restaurants?${params}`);
+        if (!response.ok) throw new Error('지도 자료를 가져오지 못했어요.');
+        mapPlaces = deduplicateMapPlaces(await response.json());
+        mapStatus.textContent = `지도에 ${mapPlaces.length}곳 표시 · 숫자는 겹친 가게 수`;
+        if (mapPlaces.length) {
+          const bounds = new naver.maps.LatLngBounds();
+          mapPlaces.forEach((place) => bounds.extend(new naver.maps.LatLng(place.latitude, place.longitude)));
+          map.fitBounds(bounds, 48);
+        }
+        redrawMarkers();
+        // Panning only moves existing markers with the map. Rebuild clusters
+        // after zoom changes, once per animation frame, to keep dragging smooth.
+        naver.maps.Event.addListener(map, 'zoom_changed', scheduleMarkerRedraw);
+      } catch (error) {
+        mapStatus.textContent = error.message;
+      }
+    });
+
+    document.querySelectorAll('.card[data-lat][data-lng]').forEach((card) => {
+      card.addEventListener('click', () => {
+        const lat = Number(card.dataset.lat), lng = Number(card.dataset.lng);
+        if (!lat || !lng) return;
+        selectedPlaceId = Number(card.dataset.id);
+        highlightPlaceCard(selectedPlaceId);
+        map.setCenter(new naver.maps.LatLng(lat, lng));
+        map.setZoom(18);
+        naver.maps.Event.once(map, 'idle', () => {
+          // Rebuild at the final zoom so the selected pin is separated from
+          // nearby clusters, then anchor the popup to that exact pin.
+          redrawQueued = false;
+          redrawMarkers();
+          const marker = markerByPlaceId.get(selectedPlaceId);
+          const place = mapPlaces.find((item) => item.id === selectedPlaceId);
+          if (marker && place) showPlace(place, marker);
+        });
+      });
+    });
+  </script>
+  {% endif %}
+</body>
+</html>

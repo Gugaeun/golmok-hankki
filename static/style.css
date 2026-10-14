@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+.crawl-status{font-size:11px;color:#64736b;background:#eaf2eb;border-radius:8px;padding:8px 10px;margin:-3px 0 12px}.map-status{position:absolute;z-index:5;top:14px;left:14px;background:#fff;border:1px solid #e3e9e2;border-radius:999px;padding:8px 12px;font-size:12px;color:#426b53;box-shadow:0 2px 10px #20352a18}.map-panel{position:relative}
+.quality-filter{display:flex;align-items:center;gap:12px;margin:-10px 0 18px;font-size:12px;color:#725609}.quality-filter label{display:flex;align-items:center;gap:7px;cursor:pointer;background:#fff8df;border:1px solid #efd992;border-radius:999px;padding:8px 12px}.quality-filter input{accent-color:#bd8711}.quality-filter a{color:#84620b}
+.category-filter{display:flex;align-items:center;gap:10px;margin:-10px 0 18px;font-size:12px;color:#65736a}.category-filter select{min-width:180px;max-width:100%;border:1px solid #dfe5dd;border-radius:9px;background:#fff;padding:8px 11px;color:#34443a;font:inherit}
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:-10px 0 18px}.filter-row .category-filter,.filter-row .quality-filter{margin:0}
+:root{--ink:#292b28;--muted:#626b64;--accent:#bd5138;--accent-deep:#9f3d2a;--accent-soft:#fff0e9;--canvas:#f7f4ee;--surface:#fffdfa;--line:#e6e0d6;color:var(--ink);background:var(--canvas)}
+body{background:var(--canvas);color:var(--ink)}.topbar{background:var(--surface);border-color:var(--line)}.brand{color:var(--accent-deep)}.topbar span,.category,.count,.card p{color:var(--muted)}
+.search input,.category-filter select{border-color:var(--line);color:var(--ink);background:var(--surface)}.search input:focus,.category-filter select:focus{outline:3px solid #bd513833;border-color:var(--accent)}.search button,.add-form button{background:var(--accent);transition:background .15s ease}.search button:hover,.add-form button:hover{background:var(--accent-deep)}
+.search input,.search button{font-size:14px}.count{font-size:14px}.card{padding:17px}.card h2{font-size:18px}.card p{font-size:13px;line-height:1.55}.area-tag,.category{font-size:12px}.category-filter label,.quality-filter{font-size:13px}
+.chip{border-color:var(--line);color:var(--muted);background:var(--surface)}.chip.selected{background:var(--accent-soft);border-color:#e8b5a6;color:var(--accent-deep)}.quality-filter label{background:#fff8e6;border-color:#ecd695;color:#684e0e}.card{background:var(--surface);border-color:var(--line)}.card:hover{border-color:#d69a88}.card.is-selected{border:2px solid var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px #bd51381c}.area-tag{color:#315c61;background:#eaf2ef}.card h2{color:var(--ink)}.crawl-status{background:#f0eee8;color:#51584f}.add-place{background:var(--surface);border-color:var(--line)}.add-place summary{color:var(--accent-deep)}.note{color:#687068}
+.exemplary-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#654600;background:#fff0c2;border:1px solid #efd27d;border-radius:6px;padding:4px 7px;white-space:nowrap}.exemplary-tag span{color:#a86d00}.map-legend{position:absolute;z-index:5;top:58px;left:14px;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #efd27d;border-radius:9px;padding:8px 11px;color:#654600;font-size:12px;box-shadow:0 2px 10px #20352a18}.map-legend span{color:#b77a08;font-size:15px}
+:root{font-family:'DM Sans','Noto Sans KR',sans-serif;color:#202b26;background:#f6f7f3;font-synthesis:none}*{box-sizing:border-box}body{margin:0}.topbar{height:72px;display:flex;align-items:center;gap:20px;padding:0 5vw;background:#fff;border-bottom:1px solid #e8ebe4}.brand{font-size:20px;font-weight:800;color:#1e684b;text-decoration:none;letter-spacing:-.06em}.topbar span{font-size:13px;color:#7b847e}.layout{min-height:calc(100vh - 72px);display:grid;grid-template-columns:minmax(360px,470px) 1fr;gap:32px;padding:36px 5vw}.results{max-width:470px;width:100%;margin:auto}.eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;color:#47936f;text-transform:uppercase;margin:0 0 14px}h1{font-size:36px;line-height:1.3;letter-spacing:-.07em;margin:0 0 26px}.search{display:flex;gap:8px}.search input{min-width:0;flex:1;border:1px solid #dfe5dd;border-radius:12px;padding:13px 14px;font:inherit;background:white}.search button{border:0;border-radius:12px;background:#24734f;color:#fff;padding:0 19px;font:inherit;font-weight:700;cursor:pointer}.filters{display:flex;gap:8px;margin:16px 0 23px}.chip{border:1px solid #e0e5df;border-radius:999px;padding:8px 14px;color:#66716a;text-decoration:none;font-size:13px;background:#fff}.chip.selected{background:#e5f2e9;border-color:#c6e2ce;color:#246644;font-weight:700}.count{font-size:13px;color:#7b847e;margin:0 0 10px}.cards{display:grid;gap:10px}.card{background:#fff;border:1px solid #e8ebe5;border-radius:15px;padding:16px;cursor:pointer;transition:.15s}.card:hover{border-color:#9cc9aa;transform:translateY(-1px)}.card-top{display:flex;justify-content:space-between}.area-tag{font-size:11px;color:#26714d;background:#edf6ef;border-radius:6px;padding:4px 7px}.category{font-size:12px;color:#929a94}.card h2{font-size:17px;letter-spacing:-.04em;margin:10px 0 4px}.card p{font-size:12px;color:#7b847e;margin:0}.empty{padding:30px;text-align:center;color:#7b847e;background:white;border-radius:15px}.note{font-size:11px;color:#939b95;margin-top:14px}.map-panel{min-height:600px;border-radius:24px;overflow:hidden;background:#e5eee4;box-shadow:0 12px 40px #23382a0d}#map{width:100%;height:100%;min-height:600px}.map-placeholder{height:100%;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;color:#667b6c;background:radial-gradient(ellipse at 30% 40%,#f1f4e7 0 12%,transparent 13%),radial-gradient(ellipse at 70% 55%,#d8e8d7 0 16%,transparent 17%),linear-gradient(135deg,#e7eee0,#dce9df)}.pin{font-size:44px;color:#36815c}.map-placeholder h2{font-size:20px;margin:12px 0 4px}.map-placeholder p{max-width:360px;font-size:13px;line-height:1.6}.map-placeholder code{background:#ffffffa8;border-radius:4px;padding:2px 5px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:850px){.layout{grid-template-columns:1fr;padding:25px 5vw}.results{max-width:none}.map-panel,#map,.map-placeholder{min-height:390px}.topbar{padding:0 5vw}}
+.message{padding:10px 12px;margin:0 0 10px;border-radius:9px;font-size:13px}.message.success{background:#e8f5eb;color:#276742}.message.error{background:#fff0ed;color:#a53b2c}.add-place{margin-top:14px;background:#fff;border:1px solid #e8ebe5;border-radius:14px;padding:13px 15px}.add-place summary{cursor:pointer;color:#246644;font-weight:700;font-size:14px}.add-form{display:grid;gap:10px;margin-top:14px}.add-form label{display:grid;gap:5px;color:#68736c;font-size:12px}.add-form input,.add-form select{width:100%;border:1px solid #dfe5dd;border-radius:9px;padding:10px;font:inherit;background:#fff}.coordinate-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.add-form button{border:0;border-radius:9px;padding:11px;background:#24734f;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.layout{height:calc(100vh - 72px);min-height:0;overflow:hidden;align-items:stretch}.results{height:100%;min-height:0;display:flex;flex-direction:column}.cards{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 7px 8px 0;scrollbar-gutter:stable}.map-panel{position:relative;height:100%;min-height:0}.map-panel #map{height:100%;min-height:0}.pagination{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:18px;margin:10px 0}.pagination a{color:#26714d;text-decoration:none;font-size:13px;font-weight:700}.pagination span{font-size:12px;color:#7b847e}.add-place,.note{flex:0 0 auto}@media(max-width:850px){.layout{height:auto;min-height:calc(100vh - 72px);overflow:visible;align-items:start}.results{height:auto;min-height:0;display:block}.cards{max-height:55vh;min-height:180px;overflow-y:auto}.map-panel{position:static;height:390px;min-height:390px}.map-panel #map{height:100%;min-height:0}}
+.crawl-status{font-size:11px;color:#64736b;background:#eaf2eb;border-radius:8px;padding:8px 10px;margin:-3px 0 12px}.map-status{position:absolute;z-index:5;top:14px;left:14px;background:#fff;border:1px solid #e3e9e2;border-radius:999px;padding:8px 12px;font-size:12px;color:#426b53;box-shadow:0 2px 10px #20352a18}.map-panel{position:relative}
+/* Theme overrides: keep these after the base styles so the palette takes effect. */
+:root{color:#292b28;background:#f7f4ee}
+body{background:#f7f4ee;color:#292b28}
+.topbar{background:#fffdfa;border-bottom-color:#e6e0d6}
+.brand{color:#9f3d2a}
+.search button,.add-form button{background:#bd5138}
+.search button:hover,.add-form button:hover{background:#9f3d2a}
+.chip.selected{background:#fff0e9;border-color:#e8b5a6;color:#9f3d2a}
+.card{background:#fffdfa;border-color:#e6e0d6}
+.card:hover{border-color:#d69a88}
+.card.is-selected{border:2px solid #bd5138;background:#fff0e9;box-shadow:0 0 0 3px #bd51381c}
+.card h2{color:#292b28;font-size:18px}
+.card p{color:#626b64;font-size:13px;line-height:1.55}
+.count,.category,.topbar span{color:#626b64}
+.search input,.category-filter select{border-color:#e6e0d6;background:#fffdfa;color:#292b28}
+.search input:focus,.category-filter select:focus{outline:3px solid #bd513833;border-color:#bd5138}
+.quality-filter label{background:#fff8e6;border-color:#ecd695;color:#684e0e}
+.crawl-status{background:#f0eee8;color:#51584f}
+.add-place{background:#fffdfa;border-color:#e6e0d6}
+.add-place summary{color:#9f3d2a}
+/* Keep warm red as an accent; use calm colors for labels and headings. */
+.brand{color:#1e684b}
+.chip.selected{background:#e5f2e9;border-color:#c6e2ce;color:#246644}
+.add-place summary{color:#246644}
+.card.is-selected{border-color:#bd5138;background:#fffdfa;box-shadow:0 0 0 2px #bd51381a}
+.card-top{justify-content:flex-start;align-items:center;flex-wrap:wrap;gap:7px}.category{margin-left:auto}
+/* Golmok Hankki palette: forest green, sage, and warm rice cream. */
+:root{color:#26332b;background:#f5f3e9}
+body{background:#f5f3e9;color:#26332b}
+.topbar{background:#fffefa;border-bottom-color:#dfe5da}
+.brand{color:#285b42}
+.search button,.add-form button{background:#2f684c}
+.search button:hover,.add-form button:hover{background:#234d39}
+.chip.selected{background:#e8f1e8;border-color:#bfd5c2;color:#285b42}
+.card{background:#fffefa;border-color:#e1e5dc}
+.card:hover{border-color:#9cbea2}
+.card.is-selected{border-color:#2f684c;background:#f0f6ef;box-shadow:0 0 0 2px #2f684c26}
+.card h2{color:#26332b}
+.card p,.count,.category,.topbar span{color:#637067}
+.search input,.category-filter select{border-color:#dfe5da;background:#fffefa;color:#26332b}
+.search input:focus,.category-filter select:focus{outline:3px solid #2f684c33;border-color:#2f684c}
+.area-tag{color:#285b42;background:#e8f1e8}
+.add-place{background:#fffefa;border-color:#e1e5dc}
+.add-place summary{color:#285b42}
+.crawl-status{background:#eaf0e8;color:#526257}
+/* Golmok Hankki palette: slate blue, apricot, and warm cream. */
+:root{color:#2c3438;background:#f6f2e9}
+body{background:#f6f2e9;color:#2c3438}
+.topbar{background:#fffdfa;border-bottom-color:#e4dfd4}
+.brand{color:#35566a}
+.search button,.add-form button{background:#35566a}
+.search button:hover,.add-form button:hover{background:#284554}
+.chip.selected{background:#e8eff1;border-color:#c3d3d8;color:#35566a}
+.card{background:#fffdfa;border-color:#e4dfd4}
+.card:hover{border-color:#d7ad82}
+.card.is-selected{border-color:#d99a58;background:#fff9f0;box-shadow:0 0 0 2px #d99a5826}
+.card h2{color:#2c3438}
+.card p,.count,.category,.topbar span{color:#626d72}
+.search input,.category-filter select{border-color:#e4dfd4;background:#fffdfa;color:#2c3438}
+.search input:focus,.category-filter select:focus{outline:3px solid #35566a33;border-color:#35566a}
+.area-tag{color:#35566a;background:#e8eff1}
+.add-place{background:#fffdfa;border-color:#e4dfd4}
+.add-place summary{color:#35566a}
+.crawl-status{background:#edf0ed;color:#59666a}
+.eyebrow{color:#35566a}
