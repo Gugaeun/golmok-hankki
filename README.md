@@ -1,6 +1,53 @@
 # 골목 한끼
 
-중곡동·군자동·화양동·능동 맛집을 모아보는 Flask + SQLite 포트폴리오 프로젝트입니다.
+중곡동·군자동·화양동·능동 음식점을 한곳에 모아 검색과 지도로 보여주는 Flask + SQLite 웹 서비스입니다. 서울 열린데이터광장의 일반음식점 인허가 자료와 광진구청 보건소의 모범음식점 목록을 합쳐 사용합니다.
+
+![서비스 화면](docs/images/screenshot-main.png)
+
+## 구조
+
+수집 → 정리 → 저장 → 서비스 순서로 동작합니다.
+
+![구조도](docs/images/pipeline.png)
+
+| 단계 | 내용 |
+|---|---|
+| 수집 | 인허가 CSV 가져오기, 구청 모범음식점 목록 크롤링 |
+| 정리 | 이름·주소로 같은 음식점 판별, 행정동 판별 |
+| 저장 | SQLite (`restaurants`, `crawl_runs`) |
+| 서비스 | Flask 검색·필터 화면, 네이버 지도 마커·팝업 |
+
+## 사용 기술
+
+| 기술 | 활용 |
+|---|---|
+| Requests | 구청 목록 페이지 요청 |
+| BeautifulSoup | HTML에서 이름·업태·주소·상세 링크 추출 |
+| SQLite | 음식점 정보와 크롤링 실행 이력 저장 |
+| Flask | 동네 필터·검색·목록 화면과 지도용 API |
+| Naver Maps API | 지도 표시, 마커·팝업 |
+| Naver Geocoding API | 좌표가 없는 모범음식점의 주소를 좌표로 변환 |
+
+## 지도 팝업과 크롤링 대상
+
+마커를 누르면 이름, 주소, 출처가 팝업으로 표시되고, 모범음식점에는 별 표시가 붙습니다.
+
+![지도 팝업](docs/images/screenshot-popup.png)
+
+크롤러는 구청 목록 페이지의 HTML 구조를 F12로 확인한 뒤 작성했습니다. 목록 한 칸에 이름·업태·주소가 들어 있어 목록 페이지만으로 대부분 수집할 수 있습니다.
+
+![F12 요소 확인](docs/images/f12-elements.png)
+
+## 같은 음식점 판별 기준
+
+| 기준 | 내용 | 코드 |
+|---|---|---|
+| 이름 정규화 | 기호·공백을 제거하고 비교 | `restaurant_identity.py` `normalize_name` |
+| 같은 음식점 | 이름이 같고, 도로명+건물번호가 같거나 거리 18m 이내 | `restaurant_identity.py` `duplicate_place` |
+| 지도 표시 | 같은 동·같은 이름·25m 이내를 한 번 더 합침 | `templates/index.html` `deduplicateMapPlaces` |
+| 동네 판별 | 행정동 글자만 인식하고 도로명 `능동로`는 제외 | `restaurant_identity.py` `find_address_dong` |
+
+거리 기준 18m는 같은 이름 음식점 쌍 48개의 거리 분포(14m 이내 14쌍, 300m 이상 33쌍, 그 사이는 1쌍)를 확인해 정했습니다. 거리 제한이 없으면 같은 이름의 먼 가게 좌표로 마커가 이동할 수 있습니다. (2026-10-01 시점 DB 기준)
 
 ## 실행
 
@@ -14,7 +61,7 @@ py app.py
 
 처음 한 번은 프로젝트 폴더의 `.env` 파일을 열어 `NAVER_MAP_CLIENT_ID=` 뒤에 발급받은 Client ID를 입력하고 저장하세요. Geocoding을 사용할 때는 `NAVER_MAP_API_KEY_ID`와 `NAVER_MAP_API_KEY`도 입력합니다. `.env`는 Git에 포함되지 않으므로 키를 안전하게 보관할 수 있고, 이후에는 새 터미널을 열어도 다시 설정할 필요가 없습니다.
 
-브라우저에서 `http://127.0.0.1:5000`을 여세요. 지도 인증은 Naver Cloud Platform에 등록한 `http://localhost`에서 실행해야 합니다.
+브라우저에서 `http://localhost:5000`을 여세요. 지도 인증은 Naver Cloud Platform에 등록한 `http://localhost`에서만 동작하므로, `127.0.0.1`로 접속하면 지도가 표시되지 않습니다.
 
 첫 실행 시 `restaurants.db`가 만들어지고, 화면 구성 확인용 샘플 행 두 개가 들어갑니다. 샘플 주소와 좌표는 실제 가게 정보가 아니므로 실제 데이터로 바꿔야 합니다. Client Secret은 브라우저나 저장소에 넣지 마세요.
 
@@ -80,3 +127,10 @@ py geocode_restaurants.py --exemplary-only
 이 옵션은 좌표가 비어 있는 모범음식점만 최대 30곳 처리하므로 일반음식점 전체를 조회하지 않습니다.
 
 출처: [광진구청 보건소 모범음식점 목록](https://www.gwangjin.go.kr/health/bbs/B0000064/list.do?menuNo=300236). 페이지 형식이나 접근 정책이 바뀌면 크롤러 선택자를 조정해야 합니다.
+
+## 유의 사항
+
+- 학습 목적의 포트폴리오 프로젝트입니다.
+- 크롤링 대상 사이트의 `robots.txt`와 이용 정책을 직접 확인한 뒤 사용하세요.
+- `.env`와 `restaurants.db`는 저장소에 포함되어 있지 않습니다. 크롤러와 가져오기 스크립트를 실행하면 DB가 생성됩니다.
+- 이 프로젝트는 생성형 AI(Codex, Claude)의 도움을 받아 개발했습니다.
